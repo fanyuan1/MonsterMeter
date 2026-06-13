@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/audio/audioengine.ts","./src/audio/alert.ts","./src/audio/wav.ts","./src/components/clips.tsx","./src/components/monitor.tsx","./src/components/monster.tsx","./src/components/settings.tsx","./src/state/settings.ts","./src/storage/clips.ts"],"version":"5.9.3"}
