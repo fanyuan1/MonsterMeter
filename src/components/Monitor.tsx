@@ -102,6 +102,11 @@ export function Monitor({
 
   const thresholdFrac = dbToFraction(thresholdDb);
   const tickAngle = 225 + thresholdFrac * 270; // gauge starts at 225deg, sweeps 270deg
+  // Position the threshold number just inside the tick, kept upright.
+  const tickRad = (tickAngle * Math.PI) / 180;
+  const labelR = 41; // % of the stage, from center
+  const labelX = 50 + labelR * Math.sin(tickRad);
+  const labelY = 50 - labelR * Math.cos(tickRad);
 
   return (
     <div className="monitor">
@@ -134,6 +139,9 @@ export function Monitor({
         <div className="alert-flash" ref={flashRef} />
         <div className="threshold-tick" style={{ transform: `rotate(${tickAngle}deg)` }}>
           <div className="tick" />
+        </div>
+        <div className="tick-num" style={{ left: `${labelX}%`, top: `${labelY}%` }}>
+          {Math.round(thresholdDb)}
         </div>
         <div className="monster-inner">
           <Monster id={monsterId} emotion={running ? emotion : "happy"} />
@@ -172,9 +180,6 @@ export function Monitor({
             Stop
           </button>
         )}
-        <div className="hint">
-          Threshold {Math.round(thresholdDb)} dB — the white tick marks it on the dial.
-        </div>
       </div>
     </div>
   );

@@ -7,7 +7,10 @@
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173/)",
       "Bash(kill %1)",
       "mcp__Claude_Preview__preview_start",
-      "Bash(node scripts/strip-checkerboard.mjs)"
+      "Bash(node scripts/strip-checkerboard.mjs)",
+      "Bash(node -e \"console.log\\(require\\('vite/package.json'\\).version\\)\")",
+      "Bash(git rm *)",
+      "Bash(git add *)"
     ]
   }
 }

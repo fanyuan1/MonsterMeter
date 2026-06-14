@@ -1,9 +1,10 @@
-import type { AlertType } from "../state/settings";
+/** A playable sound: a synth tone or an audio file URL. */
+export type SoundSpec = { kind: "siren" } | { kind: "beep" } | { kind: "file"; url: string };
 
 export interface AlertOptions {
-  type: AlertType;
-  phrase: string;
+  phrase: string; // blank = no speech
   volume: number; // 0..1
+  sounds: SoundSpec[];
 }
 
 /** Speak a phrase via the Web Speech API (no audio assets needed). */
@@ -63,21 +64,31 @@ function playBeep(ctx: AudioContext, volume: number) {
   }
 }
 
-/** Play an alert. Tone types need an AudioContext; speech adds a siren BGM if one is given. */
+/** Play an audio-file sound (bundled asset or uploaded data URL). */
+function playFile(url: string, volume: number) {
+  try {
+    const a = new Audio(url);
+    a.volume = Math.max(0, Math.min(1, volume));
+    void a.play().catch(() => {});
+  } catch {
+    /* ignore playback errors */
+  }
+}
+
+/**
+ * Play an alert: speak the phrase (if any) and play every selected sound
+ * together. Synth tones need an AudioContext; files do not.
+ */
 export function playAlert(ctx: AudioContext | null, opts: AlertOptions) {
-  switch (opts.type) {
-    case "speech":
-      speak(opts.phrase, opts.volume);
-      // Layer an urgent siren underneath the voice, a little quieter so the
-      // words stay intelligible.
-      if (ctx) playSiren(ctx, opts.volume * 0.45);
-      break;
-    case "siren":
+  if (opts.phrase && opts.phrase.trim()) speak(opts.phrase, opts.volume);
+  for (const s of opts.sounds) {
+    if (s.kind === "siren") {
       if (ctx) playSiren(ctx, opts.volume);
-      break;
-    case "beep":
+    } else if (s.kind === "beep") {
       if (ctx) playBeep(ctx, opts.volume);
-      break;
+    } else {
+      playFile(s.url, opts.volume);
+    }
   }
 }
 

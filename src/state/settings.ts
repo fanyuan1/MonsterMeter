@@ -1,4 +1,9 @@
-export type AlertType = "speech" | "siren" | "beep";
+/** A user-uploaded alert sound, stored inline as a data URL. */
+export interface CustomSound {
+  id: string;
+  name: string;
+  dataUrl: string;
+}
 
 /** The monster's mood, escalating with the noise level. */
 export type Emotion = "happy" | "indifferent" | "mad" | "veryMad";
@@ -20,10 +25,12 @@ export interface Settings {
   thresholdDb: number;
   /** Play a sound effect the moment the level crosses the threshold. */
   alertEnabled: boolean;
-  /** Which alert to play: spoken phrase, synth siren, or beep. */
-  alertType: AlertType;
-  /** Phrase spoken when alertType is "speech". */
+  /** Spoken phrase; blank = no speech. */
   alertPhrase: string;
+  /** Ids of the selected sounds (built-in or custom). Multiple may play together. */
+  alertSounds: string[];
+  /** User-uploaded custom sounds. */
+  customSounds: CustomSound[];
   /** Alert loudness, 0..1. */
   alertVolume: number;
   /** Seconds of audio kept *before* the trigger. */
@@ -43,8 +50,9 @@ export interface Settings {
 export const DEFAULT_SETTINGS: Settings = {
   thresholdDb: 100,
   alertEnabled: true,
-  alertType: "speech",
-  alertPhrase: "Danger danger danger",
+  alertPhrase: "",
+  alertSounds: ["nile"],
+  customSounds: [],
   alertVolume: 0.8,
   preRollSec: 3,
   postRollSec: 3,

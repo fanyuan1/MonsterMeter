@@ -1,6 +1,6 @@
 import { encodeWav } from "./wav";
 import { playAlert } from "./alert";
-import type { AlertType } from "../state/settings";
+import type { SoundSpec } from "./alert";
 
 export interface RecordedClip {
   blob: Blob;
@@ -16,9 +16,9 @@ export interface EngineConfig {
   postRollSec: number;
   calibrationDb: number;
   alertEnabled: boolean;
-  alertType: AlertType;
   alertPhrase: string;
   alertVolume: number;
+  alertSounds: SoundSpec[];
 }
 
 type LevelListener = (db: number) => void;
@@ -220,9 +220,9 @@ export class AudioEngine {
       this.thresholdListeners.forEach((fn) => fn(db));
       if (this.cfg.alertEnabled) {
         playAlert(this.ctx, {
-          type: this.cfg.alertType,
           phrase: this.cfg.alertPhrase,
           volume: this.cfg.alertVolume,
+          sounds: this.cfg.alertSounds,
         });
       }
     }

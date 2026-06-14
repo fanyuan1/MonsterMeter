@@ -3,3 +3,13 @@ dist
 dev.log
 *.local
 .DS_Store
+
+# Firebase local artifacts
+.firebase/
+firebase-debug.log
+firestore-debug.log
+database-debug.log
+*-debug.log
+
+# Build cache
+tsconfig.tsbuildinfo

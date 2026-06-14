@@ -108,14 +108,14 @@ button {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   height: 100%;
 }
 
 .db-readout {
   text-align: center;
-  margin-top: 4px;
-  height: 120px;
+  margin-top: 2px;
+  height: 88px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -123,7 +123,7 @@ button {
 }
 .db-number {
   font-family: "Fredoka", system-ui, sans-serif;
-  font-size: 76px;
+  font-size: 62px;
   font-weight: 700;
   line-height: 1;
   color: var(--accent);
@@ -145,7 +145,8 @@ button {
 .monster-stage {
   --lvl: 0;
   position: relative;
-  width: min(78vw, 320px);
+  /* also capped by viewport height so the whole monitor fits without scrolling */
+  width: min(74vw, 300px, 38vh);
   aspect-ratio: 1;
   display: flex;
   align-items: center;
@@ -220,6 +221,17 @@ button {
   background: #3f3147;
   border-radius: 2px;
   box-shadow: 0 0 4px rgba(255, 255, 255, 0.7);
+}
+/* Threshold value labelling the danger-zone tick (upright). */
+.tick-num {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-size: 12px;
+  font-weight: 800;
+  color: #3f3147;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+  text-shadow: 0 0 4px #fff, 0 0 4px #fff, 0 0 3px #fff;
 }
 
 .last-danger {
@@ -549,6 +561,54 @@ input[type="range"] {
   color: var(--text);
   padding: 10px 12px;
   font-size: 15px;
+}
+
+/* Multi-select alert sounds */
+.sound-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.sound-chip {
+  display: inline-flex;
+  align-items: center;
+  background: #ffffff;
+  border: 1.5px solid var(--panel-border);
+  border-radius: 999px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+.sound-chip.selected {
+  border-color: var(--accent);
+  background: rgba(124, 58, 237, 0.12);
+  color: var(--accent);
+}
+/* custom chips bundle a toggle button + a remove button */
+.sound-chip:has(.chip-main) {
+  padding: 0;
+  overflow: hidden;
+}
+.sound-chip .chip-main {
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  padding: 8px 4px 8px 14px;
+}
+.sound-chip .chip-x {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1;
+  padding: 8px 12px 8px 6px;
+}
+.sound-chip.upload {
+  border-style: dashed;
+  color: var(--muted);
 }
 
 .monster-grid {

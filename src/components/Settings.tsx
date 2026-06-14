@@ -1,12 +1,8 @@
-import type { AlertType, Settings as SettingsType } from "../state/settings";
+import type { ChangeEvent } from "react";
+import type { Settings as SettingsType } from "../state/settings";
 import { previewAlert } from "../audio/alert";
+import { BUILTIN_SOUNDS, resolveSounds } from "../audio/sounds";
 import { MONSTERS, Monster } from "./Monster";
-
-const ALERT_TYPES: { id: AlertType; label: string }[] = [
-  { id: "speech", label: "Speak" },
-  { id: "siren", label: "Siren" },
-  { id: "beep", label: "Beep" },
-];
 
 interface Props {
   settings: SettingsType;
@@ -52,6 +48,36 @@ function Slider({
 }
 
 export function Settings({ settings, onChange }: Props) {
+  const toggleSound = (id: string) => {
+    const sel = settings.alertSounds.includes(id)
+      ? settings.alertSounds.filter((s) => s !== id)
+      : [...settings.alertSounds, id];
+    onChange({ alertSounds: sel });
+  };
+
+  const removeCustom = (id: string) => {
+    onChange({
+      customSounds: settings.customSounds.filter((c) => c.id !== id),
+      alertSounds: settings.alertSounds.filter((s) => s !== id),
+    });
+  };
+
+  const onUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // allow re-uploading the same file
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const id = `custom-${Date.now().toString(36)}`;
+      const name = (file.name.replace(/\.[^.]+$/, "") || "Custom").slice(0, 20);
+      onChange({
+        customSounds: [...settings.customSounds, { id, name, dataUrl: String(reader.result) }],
+        alertSounds: [...settings.alertSounds, id],
+      });
+    };
+    reader.readAsDataURL(file);
+  };
+
   return (
     <div>
       <div className="card">
@@ -107,35 +133,62 @@ export function Settings({ settings, onChange }: Props) {
 
         {settings.alertEnabled && (
           <div style={{ marginTop: 16 }}>
-            <div className="seg">
-              {ALERT_TYPES.map((a) => (
-                <button
-                  key={a.id}
-                  className={settings.alertType === a.id ? "active" : ""}
-                  onClick={() => onChange({ alertType: a.id })}
-                >
-                  {a.label}
-                </button>
-              ))}
+            <div className="field">
+              <div className="label">
+                <span>Phrase (spoken)</span>
+              </div>
+              <input
+                type="text"
+                className="text-input"
+                value={settings.alertPhrase}
+                maxLength={80}
+                placeholder="Leave blank for no speech"
+                onChange={(e) => onChange({ alertPhrase: e.target.value })}
+              />
             </div>
 
-            {settings.alertType === "speech" && (
-              <div className="field" style={{ marginTop: 16 }}>
-                <div className="label">
-                  <span>Phrase</span>
-                </div>
-                <input
-                  type="text"
-                  className="text-input"
-                  value={settings.alertPhrase}
-                  maxLength={60}
-                  placeholder="Danger danger"
-                  onChange={(e) => onChange({ alertPhrase: e.target.value })}
-                />
+            <div className="field">
+              <div className="label">
+                <span>Sounds</span>
+                <span className="val" style={{ color: "var(--muted)", fontWeight: 600 }}>
+                  pick any
+                </span>
               </div>
-            )}
+              <div className="sound-grid">
+                {BUILTIN_SOUNDS.map((s) => (
+                  <button
+                    key={s.id}
+                    className={`sound-chip ${settings.alertSounds.includes(s.id) ? "selected" : ""}`}
+                    onClick={() => toggleSound(s.id)}
+                  >
+                    {s.name}
+                  </button>
+                ))}
+                {settings.customSounds.map((s) => (
+                  <span
+                    key={s.id}
+                    className={`sound-chip ${settings.alertSounds.includes(s.id) ? "selected" : ""}`}
+                  >
+                    <button className="chip-main" onClick={() => toggleSound(s.id)}>
+                      {s.name}
+                    </button>
+                    <button
+                      className="chip-x"
+                      title="Remove"
+                      onClick={() => removeCustom(s.id)}
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+                <label className="sound-chip upload">
+                  + Upload
+                  <input type="file" accept="audio/*" hidden onChange={onUpload} />
+                </label>
+              </div>
+            </div>
 
-            <div className="field" style={{ marginTop: 16 }}>
+            <div className="field">
               <div className="label">
                 <span>Volume</span>
                 <span className="val">{Math.round(settings.alertVolume * 100)}%</span>
@@ -155,9 +208,9 @@ export function Settings({ settings, onChange }: Props) {
               style={{ width: "100%" }}
               onClick={() =>
                 previewAlert({
-                  type: settings.alertType,
-                  phrase: settings.alertPhrase || "Danger danger",
+                  phrase: settings.alertPhrase,
                   volume: settings.alertVolume,
+                  sounds: resolveSounds(settings),
                 })
               }
             >

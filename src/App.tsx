@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AudioEngine } from "./audio/AudioEngine";
-import type { RecordedClip } from "./audio/AudioEngine";
+import type { EngineConfig, RecordedClip } from "./audio/AudioEngine";
+import { resolveSounds } from "./audio/sounds";
 import { Monitor } from "./components/Monitor";
 import { Clips } from "./components/Clips";
 import { Settings } from "./components/Settings";
@@ -14,6 +15,20 @@ import {
 } from "./state/settings";
 
 type Tab = "monitor" | "clips" | "settings";
+
+/** Build the engine config from settings, resolving sound ids to playable specs. */
+function toEngineConfig(s: SettingsType): EngineConfig {
+  return {
+    thresholdDb: s.thresholdDb,
+    preRollSec: s.preRollSec,
+    postRollSec: s.postRollSec,
+    calibrationDb: s.calibrationDb,
+    alertEnabled: s.alertEnabled,
+    alertPhrase: s.alertPhrase,
+    alertVolume: s.alertVolume,
+    alertSounds: resolveSounds(s),
+  };
+}
 
 /** Simple monochrome line icons for the bottom nav (inherit currentColor). */
 function NavIcon({ name }: { name: Tab }) {
@@ -77,7 +92,7 @@ export function App() {
   // One engine instance for the app's lifetime.
   const engineRef = useRef<AudioEngine | null>(null);
   if (!engineRef.current) {
-    engineRef.current = new AudioEngine({ ...DEFAULT_SETTINGS });
+    engineRef.current = new AudioEngine(toEngineConfig(settings));
   }
   const engine = engineRef.current;
 
@@ -112,16 +127,7 @@ export function App() {
 
   // Keep the engine config in sync with settings.
   useEffect(() => {
-    engine.updateConfig({
-      thresholdDb: settings.thresholdDb,
-      preRollSec: settings.preRollSec,
-      postRollSec: settings.postRollSec,
-      calibrationDb: settings.calibrationDb,
-      alertEnabled: settings.alertEnabled,
-      alertType: settings.alertType,
-      alertPhrase: settings.alertPhrase,
-      alertVolume: settings.alertVolume,
-    });
+    engine.updateConfig(toEngineConfig(settings));
     saveSettings(settings);
   }, [engine, settings]);
 

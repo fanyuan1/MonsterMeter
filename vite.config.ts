@@ -1,10 +1,12 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
+import { defineConfig } from 'vite';
+import basicSsl from '@vitejs/plugin-basic-ssl';
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    basicSsl()
+  ],
   server: {
-    host: true, // expose on LAN so you can test on a phone (needs https for mic — see README)
-    port: 5173,
-  },
+    host: '0.0.0.0', // Exposes the server to your local network
+    port: 5173
+  }
 });
