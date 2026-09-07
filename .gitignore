@@ -13,3 +13,8 @@ database-debug.log
 
 # Build cache
 tsconfig.tsbuildinfo
+
+# Agent skills (installed locally, not project source)
+.agents/
+.claude/skills/
+skills-lock.json
