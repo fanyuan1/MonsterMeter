@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "monstermeter-9000",
     "public": "dist",
     "ignore": [
       "firebase.json",
