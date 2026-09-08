@@ -176,7 +176,7 @@ export function App() {
     <div className="app">
       <div className="topbar">
         <h1>
-          Monster<span className="accent"> Meter</span>
+          Monster<span className="accent">Meter</span>
         </h1>
       </div>
 
